@@ -10,6 +10,7 @@
 
 ### 书籍源码仓库
 - [yourtion/30dayMakeOS](https://github.com/yourtion/30dayMakeOS)
+- [一个64位操作系统的设计和实现](https://github.com/yifengyou/The-design-and-implementation-of-a-64-bit-os)
 
 ### 相关软件下载
 - [Make for Windows](https://gnuwin32.sourceforge.net/packages/make.htm)

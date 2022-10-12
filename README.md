@@ -1,6 +1,10 @@
 # 自制操作系统
 ***
 
+## 博客文章列表
+- [自制操作系统系列（一）：显示hello world开始旅程](https://juejin.cn/post/7148604415652397070)
+- [自制操作系统系列（二）：软盘读取](https://juejin.cn/post/7153429890220916767)
+
 ## 参考书籍列表
 - [《三十天自制操作系统》](https://github.com/yourtion/30dayMakeOS)
 - 《汇编程序语言设计》
@@ -14,7 +18,7 @@
 - [nasm常用指令](http://www.daileinote.com/computer/assembly/06)
 
 ### 书籍源码仓库
-- [yourtion/30dayMakeOS](https://github.com/yourtion/30dayMakeOS)
+- [《三十天自制操作系统》yourtion/30dayMakeOS](https://github.com/yourtion/30dayMakeOS)
 - [一个64位操作系统的设计和实现](https://github.com/yifengyou/The-design-and-implementation-of-a-64-bit-os)
 
 ### 相关软件下载

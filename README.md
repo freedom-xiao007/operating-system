@@ -1,5 +1,10 @@
-# 自制操作系统文章总览
+# 自制操作系统
 ***
+
+## 参考书籍列表
+- [《三十天自制操作系统》](https://github.com/yourtion/30dayMakeOS)
+- 《汇编程序语言设计》
+- [《一个64位操作系统的设计与实现》](https://github.com/yifengyou/The-design-and-implementation-of-a-64-bit-os)
 
 ## 参考链接
 - [writing-an-os-in-rust:使用rust写操作系统](https://github.com/rustcc/writing-an-os-in-rust)
@@ -23,3 +28,4 @@
 
 ### 相关博客
 - [写操作系统之开发引导扇区](https://www.cnblogs.com/chuganghong/p/15412601.html)
+- [汇编语言一发入魂 0x0C - 解放生产力](https://kviccn.github.io/posts/2020/05/%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%E4%B8%80%E5%8F%91%E5%85%A5%E9%AD%82-0x0c-%E8%A7%A3%E6%94%BE%E7%94%9F%E4%BA%A7%E5%8A%9B/)

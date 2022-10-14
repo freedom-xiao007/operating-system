@@ -27,18 +27,18 @@ OffSetOfLoader	equ	0x0820
 
 ;程序核心
 entry:
-    	MOV AX,0  ;初始化寄存器
-    	MOV SS,AX
-    	MOV SP,0x7c00
-    	MOV DS,AX
-    	MOV ES,AX
+	MOV AX,0  ;初始化寄存器
+	MOV SS,AX
+	MOV SP,0x7c00
+	MOV DS,AX
+	MOV ES,AX
 read_file_ready: ;读软盘准备
 	MOV AH, 02 ;指明读扇区功能调用
 	MOV AL, 1 ;指明要读的扇区数为1
 	MOV DL, 0x00 ;指明要读的驱动为A
 	MOV DH, 0 ;指定读取的磁头0
 	MOV CH, 0 ;柱面0
-	MOV CL, 1 ;读取扇区1（因为目前没有其他文件，就只有扇区1的启动区数据，所以我们这从1开始，不是从2开始）
+	MOV CL, 2 ;读取扇区1（因为目前没有其他文件，就只有扇区1的启动区数据，所以我们这从1开始，不是从2开始）
 	;下面三句指定读取到内存地址0x0820处
 	MOV AX, OffSetOfLoader
 	MOV ES, AX
@@ -73,10 +73,11 @@ read_file_loop: ;循环读取内容，循环的顺序是扇区->磁头->柱面�
 	;上面都完成后，到柱面的读取循环，重置扇区(前面已重置）和磁头，增加柱面（不知道为啥书中不是80而是10）
 	MOV DH, 0
 	ADD CH, 1
-	CMP CH, 10
+	CMP CH, 19
 	JB read_file
 show_mem_file: ;打印显示刚才加载的文件内容
 	MOV AX, OffSetOfLoader
+	; MOV AX, 0x0a20
 	MOV ES, AX
 	MOV DI, 0
 show_mem_byte: ;整个数据也就512，所以循环512次即可
@@ -85,57 +86,68 @@ show_mem_byte: ;整个数据也就512，所以循环512次即可
 	JE loader_end
 	ADD DI, 1
 	MOV AH,0x0e ;显示一个文字
-    	MOV BX,15 ;指定字符的颜色
-    	INT 0x10 ;调用显卡BIOS	
+	MOV BX,15 ;指定字符的颜色
+	INT 0x10 ;调用显卡BIOS
 	JMP show_mem_byte
 loader_end: ;启动程序加载完成
 	MOV AL,0x0a
-    	MOV AH,0x0e ;显示一个文字
-    	MOV BX,15 ;指定字符的颜色
-    	INT 0x10 ;调用显卡BIOS
+	MOV AH,0x0e ;显示一个文字
+	MOV BX,15 ;指定字符的颜色
+	INT 0x10 ;调用显卡BIOS
 	MOV SI,msg
 show_msg_info: ;加载完成，成功显示
-    	MOV AL,[SI]
-    	ADD SI,1
-    	CMP AL,0
-    	JE fin
-    	MOV AH,0x0e ;显示一个文字
-    	MOV BX,15 ;指定字符的颜色
-    	INT 0x10 ;调用显卡BIOS
-    	JMP show_msg_info
+	MOV AL,[SI]
+	ADD SI,1
+	CMP AL,0
+	JE fin
+	MOV AH,0x0e ;显示一个文字
+	MOV BX,15 ;指定字符的颜色
+	INT 0x10 ;调用显卡BIOS
+	JMP show_msg_info
 fin:
-    	HLT ;CPU停止,等待指令
-    	JMP fin ;无限循环
+	; HLT ;CPU停止,等待指令
+	; JMP fin ;无限循环
+
+	MOV SI, jmp_msg
+	CALL func_show_msg
+	;下面三句指定读取到内存地址0x0820处
+	MOV AX, OffSetOfLoader
+	MOV ES, AX
+	MOV BX, 0 ;数据读取后放到的内存地址
+	JMP AX
 func_show_msg:
-    	MOV AL,[SI]
-    	ADD SI,1
-    	CMP AL,0
-    	JE func_ret
-    	MOV AH,0x0e ;显示一个文字
-    	MOV BX,15 ;指定字符的颜色
-    	INT 0x10 ;调用显卡BIOS
-    	JMP func_show_msg
+	MOV AL,[SI]
+	ADD SI,1
+	CMP AL,0
+	JE func_ret
+	MOV AH,0x0e ;显示一个文字
+	MOV BX,15 ;指定字符的颜色
+	INT 0x10 ;调用显卡BIOS
+	JMP func_show_msg
 func_ret:
 	RET
 read_file_msg:
-    	DB "r"
-    	DB 0
+	DB "r"
+	DB 0
 read_file_error_msg:
-    	DB 0x0a , 0x0a ;换行两次
-    	DB "read file error!!!"
-    	DB 0x0a
-    	DB 0
+	DB 0x0a , 0x0a ;换行两次
+	DB "read file error!!!"
+	DB 0x0a
+	DB 0
 show_mem_info_msg:
 	DB 0x0a , 0x0a ;换行两次
-    	DB "start show mem file!!!"
-    	DB 0x0a
-    	DB 0
+	DB "start show mem file!!!"
+	DB 0x0a
+	DB 0
 msg:
-    	DB 0x0a , 0x0a ;换行两次
-    	DB "hello, my OS, boot loader end"
-    	DB 0x0a
-    	DB 0
-    
+	DB 0x0a , 0x0a ;换行两次
+	DB "hello, my OS, boot loader end"
+	DB 0x0a
+	DB 0
+jmp_msg:
+	DB 0x0a ;换行两次
+	DB "start jmp loader bin"
+	DB 0
 boot_flag: ;启动区标识
-    	TIMES 0x1fe-($-$$) DB 0 ;填写0x00,直到0x001fe
-    	DB 0x55, 0xaa
+	TIMES 0x1fe-($-$$) DB 0 ;填写0x00,直到0x001fe
+	DB 0x55, 0xaa

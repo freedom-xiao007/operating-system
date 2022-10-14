@@ -114,7 +114,7 @@ fin:
 	MOV AX, OffSetOfLoader
 	MOV ES, AX
 	MOV BX, 0 ;数据读取后放到的内存地址
-	JMP AX
+	JMP OffSetOfLoader:0
 func_show_msg:
 	MOV AL,[SI]
 	ADD SI,1

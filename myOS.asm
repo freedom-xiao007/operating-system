@@ -38,7 +38,7 @@ read_file_ready: ;读软盘准备
 	MOV DL, 0x00 ;指明要读的驱动为A
 	MOV DH, 0 ;指定读取的磁头0
 	MOV CH, 0 ;柱面0
-	MOV CL, 2 ;读取扇区1（因为目前没有其他文件，就只有扇区1的启动区数据，所以我们这从1开始，不是从2开始）
+	MOV CL, 2 ;原来我们是从扇区1开始读取的，现在改为2。因为扇区1是启动引导扇区，存放的就是我们的主文件，但不需要这个，所以我们直接从扇区2开始读取我们的新的文件到内存中
 	;下面三句指定读取到内存地址0x0820处
 	MOV AX, OffSetOfLoader
 	MOV ES, AX
@@ -111,9 +111,6 @@ fin:
 	MOV SI, jmp_msg
 	CALL func_show_msg
 	;下面三句指定读取到内存地址0x0820处
-	MOV AX, OffSetOfLoader
-	MOV ES, AX
-	MOV BX, 0 ;数据读取后放到的内存地址
 	JMP OffSetOfLoader:0
 func_show_msg:
 	MOV AL,[SI]

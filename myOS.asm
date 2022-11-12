@@ -1,150 +1,291 @@
-; cherry-os
-ORG 0x7c00 ;指定程序装载的位置
+;/***************************************************
+;		版权声明
+;
+;	本操作系统名为：MINE
+;	该操作系统未经授权不得以盈利或非盈利为目的进行开发，
+;	只允许个人学习以及公开交流使用
+;
+;	代码最终所有权及解释权归田宇所有；
+;
+;	本模块作者：	田宇
+;	EMail:		345538255@qq.com
+;
+;
+;***************************************************/
 
-;下面用于描述FAT12格式的软盘
-JMP entry
-DB 0x90
-DB "CHRRYIPL" ;启动区的名称可以是任意的字符串，但长度必须是8字节
-DW 512; 每一个扇区的大小，必须是512字节
-DB 1 ;簇的大小（必须为1个扇区)
-DW 1 ;FAT的起始位置（一般从第一个扇区开始）
-DB 2 ;FAT的个数 必须是2
-DW 224;根目录的大小 一般是224项
-DW 2880; 该磁盘的大小 必须是2880扇区
-DB 0xf0;磁盘的种类 必须是0xf0
-DW 9;FAT的长度 必须是9扇区
-DW 18;1个磁道(track) 有几个扇区 必须是18
-DW 2; 磁头个数 必须是2
-DD 0; 不使用分区，必须是0
-DD 2880; 重写一次磁盘大小
-DB 0,0,0x29 ;扩展引导标记 固定0x29
-DD 0xffffffff ;卷列序号
-DB "CHERRY-OS  " ;磁盘的名称（11个字节）
-DB "FAT12   " ;磁盘的格式名称（8字节）
-TIMES 18 DB 0; 先空出18字节 这里与原文写法不同
+	org	0x7c00	
 
-OffSetOfLoader	equ	0x0820
+BaseOfStack	equ	0x7c00
 
-;程序核心
-entry:
-	MOV AX,0  ;初始化寄存器
-	MOV SS,AX
-	MOV SP,0x7c00
-	MOV DS,AX
-	MOV ES,AX
-read_file_ready: ;读软盘准备
-	MOV AH, 02 ;指明读扇区功能调用
-	MOV AL, 1 ;指明要读的扇区数为1
-	MOV DL, 0x00 ;指明要读的驱动为A
-	MOV DH, 0 ;指定读取的磁头0
-	MOV CH, 0 ;柱面0
-	MOV CL, 2 ;原来我们是从扇区1开始读取的，现在改为2。因为扇区1是启动引导扇区，存放的就是我们的主文件，但不需要这个，所以我们直接从扇区2开始读取我们的新的文件到内存中
-	;下面三句指定读取到内存地址0x0820处
-	MOV AX, OffSetOfLoader
-	MOV ES, AX
-	MOV BX, 0 ;数据读取后放到的内存地址
-read_file:
-	;调试用，用于查看读取磁盘是否达到了循环次数,call相当于函数调用
-	MOV SI, read_file_msg
-	CALL func_show_msg
+BaseOfLoader	equ	0x1000
+OffsetOfLoader	equ	0x00
 
-	;前面调用函数时，改变了有关的寄存器，这里重置回来（也可以使用栈，但这个方便点）
-	MOV AH, 02 ;指明读扇区功能调用
-	MOV AL, 1 ;指明要读的扇区数为1
-	MOV BX, 0 ;数据读取后放到的内存地址
+RootDirSectors	equ	14
+SectorNumOfRootDirStart	equ	19
+SectorNumOfFAT1Start	equ	1
+SectorBalance	equ	17	
 
-	INT 13H ;调用BIOS文件读取
-	JNC read_file_loop
-	MOV SI, read_file_error_msg
-	JMP show_msg_info
-read_file_loop: ;循环读取内容，循环的顺序是扇区->磁头->柱面，不知道这里面是否有什么说法？可以调换吗？
-	;把内存地址后移0x200
-	MOV AX, ES
-	ADD AX, 0x0020
-	MOV ES, AX
-	ADD CL, 1 ;加1，读取下一个扇区
-	CMP CL, 18 ;如果CL扇区大于软盘总扇区数18，则说明读取完成，不再读取
-	JBE read_file
-	; 上面是扇区的循环，完毕后到磁头的循环,重置扇区，增加磁头到反面1
-	MOV CL, 1
-	ADD DH, 1
-	CMP DH, 2
-	JB read_file
-	;上面都完成后，到柱面的读取循环，重置扇区(前面已重置）和磁头，增加柱面（不知道为啥书中不是80而是10）
-	MOV DH, 0
-	ADD CH, 1
-	CMP CH, 19
-	JB read_file
-show_mem_file: ;打印显示刚才加载的文件内容
-	MOV AX, OffSetOfLoader
-	; MOV AX, 0x0a20
-	MOV ES, AX
-	MOV DI, 0
-show_mem_byte: ;整个数据也就512，所以循环512次即可
-	MOV AL, BYTE [ES:DI]
-	CMP DI, 512
-	JE loader_end
-	ADD DI, 1
-	MOV AH,0x0e ;显示一个文字
-	MOV BX,15 ;指定字符的颜色
-	INT 0x10 ;调用显卡BIOS
-	JMP show_mem_byte
-loader_end: ;启动程序加载完成
-	MOV AL,0x0a
-	MOV AH,0x0e ;显示一个文字
-	MOV BX,15 ;指定字符的颜色
-	INT 0x10 ;调用显卡BIOS
-	MOV SI,msg
-show_msg_info: ;加载完成，成功显示
-	MOV AL,[SI]
-	ADD SI,1
-	CMP AL,0
-	JE fin
-	MOV AH,0x0e ;显示一个文字
-	MOV BX,15 ;指定字符的颜色
-	INT 0x10 ;调用显卡BIOS
-	JMP show_msg_info
-fin:
-	; HLT ;CPU停止,等待指令
-	; JMP fin ;无限循环
+	jmp	short Label_Start
+	nop
+	BS_OEMName	db	'MINEboot'
+	BPB_BytesPerSec	dw	512
+	BPB_SecPerClus	db	1
+	BPB_RsvdSecCnt	dw	1
+	BPB_NumFATs	db	2
+	BPB_RootEntCnt	dw	224
+	BPB_TotSec16	dw	2880
+	BPB_Media	db	0xf0
+	BPB_FATSz16	dw	9
+	BPB_SecPerTrk	dw	18
+	BPB_NumHeads	dw	2
+	BPB_HiddSec	dd	0
+	BPB_TotSec32	dd	0
+	BS_DrvNum	db	0
+	BS_Reserved1	db	0
+	BS_BootSig	db	0x29
+	BS_VolID	dd	0
+	BS_VolLab	db	'boot loader'
+	BS_FileSysType	db	'FAT12   '
 
-	MOV SI, jmp_msg
-	CALL func_show_msg
-	;下面三句指定读取到内存地址0x0820处
-	JMP OffSetOfLoader:0
-func_show_msg:
-	MOV AL,[SI]
-	ADD SI,1
-	CMP AL,0
-	JE func_ret
-	MOV AH,0x0e ;显示一个文字
-	MOV BX,15 ;指定字符的颜色
-	INT 0x10 ;调用显卡BIOS
-	JMP func_show_msg
-func_ret:
-	RET
-read_file_msg:
-	DB "r"
-	DB 0
-read_file_error_msg:
-	DB 0x0a , 0x0a ;换行两次
-	DB "read file error!!!"
-	DB 0x0a
-	DB 0
-show_mem_info_msg:
-	DB 0x0a , 0x0a ;换行两次
-	DB "start show mem file!!!"
-	DB 0x0a
-	DB 0
-msg:
-	DB 0x0a , 0x0a ;换行两次
-	DB "hello, my OS, boot loader end"
-	DB 0x0a
-	DB 0
-jmp_msg:
-	DB 0x0a ;换行两次
-	DB "start jmp loader bin"
-	DB 0
-boot_flag: ;启动区标识
-	TIMES 0x1fe-($-$$) DB 0 ;填写0x00,直到0x001fe
-	DB 0x55, 0xaa
+Label_Start:
+
+	mov	ax,	cs
+	mov	ds,	ax
+	mov	es,	ax
+	mov	ss,	ax
+	mov	sp,	BaseOfStack
+
+;=======	clear screen
+
+	mov	ax,	0600h
+	mov	bx,	0700h
+	mov	cx,	0
+	mov	dx,	0184fh
+	int	10h
+
+;=======	set focus
+
+	mov	ax,	0200h
+	mov	bx,	0000h
+	mov	dx,	0000h
+	int	10h
+
+;=======	display on screen : Start Booting......
+
+	mov	ax,	1301h
+	mov	bx,	000fh
+	mov	dx,	0000h
+	mov	cx,	10
+	push	ax
+	mov	ax,	ds
+	mov	es,	ax
+	pop	ax
+	mov	bp,	StartBootMessage
+	int	10h
+
+;=======	reset floppy
+
+	xor	ah,	ah
+	xor	dl,	dl
+	int	13h
+
+;=======	search loader.bin
+	mov	word	[SectorNo],	SectorNumOfRootDirStart
+
+Lable_Search_In_Root_Dir_Begin:
+
+	cmp	word	[RootDirSizeForLoop],	0
+	jz	Label_No_LoaderBin
+	dec	word	[RootDirSizeForLoop]	
+	mov	ax,	00h
+	mov	es,	ax
+	mov	bx,	8000h
+	mov	ax,	[SectorNo]
+	mov	cl,	1
+	call	Func_ReadOneSector
+	mov	si,	LoaderFileName
+	mov	di,	8000h
+	cld
+	mov	dx,	10h
+	
+Label_Search_For_LoaderBin:
+
+	cmp	dx,	0
+	jz	Label_Goto_Next_Sector_In_Root_Dir
+	dec	dx
+	mov	cx,	11
+
+Label_Cmp_FileName:
+
+	cmp	cx,	0
+	jz	Label_FileName_Found
+	dec	cx
+	lodsb	
+	cmp	al,	byte	[es:di]
+	jz	Label_Go_On
+	jmp	Label_Different
+
+Label_Go_On:
+	
+	inc	di
+	jmp	Label_Cmp_FileName
+
+Label_Different:
+
+	and	di,	0ffe0h
+	add	di,	20h
+	mov	si,	LoaderFileName
+	jmp	Label_Search_For_LoaderBin
+
+Label_Goto_Next_Sector_In_Root_Dir:
+	
+	add	word	[SectorNo],	1
+	jmp	Lable_Search_In_Root_Dir_Begin
+	
+;=======	display on screen : ERROR:No LOADER Found
+
+Label_No_LoaderBin:
+
+	mov	ax,	1301h
+	mov	bx,	008ch
+	mov	dx,	0100h
+	mov	cx,	21
+	push	ax
+	mov	ax,	ds
+	mov	es,	ax
+	pop	ax
+	mov	bp,	NoLoaderMessage
+	int	10h
+	jmp	$
+
+;=======	found loader.bin name in root director struct
+
+Label_FileName_Found:
+
+	mov	ax,	RootDirSectors
+	and	di,	0ffe0h
+	add	di,	01ah
+	mov	cx,	word	[es:di]
+	push	cx
+	add	cx,	ax
+	add	cx,	SectorBalance
+	mov	ax,	BaseOfLoader
+	mov	es,	ax
+	mov	bx,	OffsetOfLoader
+	mov	ax,	cx
+
+Label_Go_On_Loading_File:
+	push	ax
+	push	bx
+	mov	ah,	0eh
+	mov	al,	'.'
+	mov	bl,	0fh
+	int	10h
+	pop	bx
+	pop	ax
+
+	mov	cl,	1
+	call	Func_ReadOneSector
+	pop	ax
+	call	Func_GetFATEntry
+	cmp	ax,	0fffh
+	jz	Label_File_Loaded
+	push	ax
+	mov	dx,	RootDirSectors
+	add	ax,	dx
+	add	ax,	SectorBalance
+	add	bx,	[BPB_BytesPerSec]
+	jmp	Label_Go_On_Loading_File
+
+Label_File_Loaded:
+	
+	jmp	BaseOfLoader:OffsetOfLoader
+
+;=======	read one sector from floppy
+
+Func_ReadOneSector:
+	
+	push	bp
+	mov	bp,	sp
+	sub	esp,	2
+	mov	byte	[bp - 2],	cl
+	push	bx
+	mov	bl,	[BPB_SecPerTrk]
+	div	bl
+	inc	ah
+	mov	cl,	ah
+	mov	dh,	al
+	shr	al,	1
+	mov	ch,	al
+	and	dh,	1
+	pop	bx
+	mov	dl,	[BS_DrvNum]
+Label_Go_On_Reading:
+	mov	ah,	2
+	mov	al,	byte	[bp - 2]
+	int	13h
+	jc	Label_Go_On_Reading
+	add	esp,	2
+	pop	bp
+	ret
+
+;=======	get FAT Entry
+
+Func_GetFATEntry:
+
+	push	es
+	push	bx
+	push	ax
+	mov	ax,	00
+	mov	es,	ax
+	pop	ax
+	mov	byte	[Odd],	0
+	mov	bx,	3
+	mul	bx
+	mov	bx,	2
+	div	bx
+	cmp	dx,	0
+	jz	Label_Even
+	mov	byte	[Odd],	1
+
+Label_Even:
+
+	xor	dx,	dx
+	mov	bx,	[BPB_BytesPerSec]
+	div	bx
+	push	dx
+	mov	bx,	8000h
+	add	ax,	SectorNumOfFAT1Start
+	mov	cl,	2
+	call	Func_ReadOneSector
+	
+	pop	dx
+	add	bx,	dx
+	mov	ax,	[es:bx]
+	cmp	byte	[Odd],	1
+	jnz	Label_Even_2
+	shr	ax,	4
+
+Label_Even_2:
+	and	ax,	0fffh
+	pop	bx
+	pop	es
+	ret
+
+;=======	tmp variable
+
+RootDirSizeForLoop	dw	RootDirSectors
+SectorNo		dw	0
+Odd			db	0
+
+;=======	display messages
+
+StartBootMessage:	db	"Start Boot"
+NoLoaderMessage:	db	"ERROR:No LOADER Found"
+LoaderFileName:		db	"LOADER  BIN",0
+
+;=======	fill zero until whole sector
+
+	times	510 - ($ - $$)	db	0
+	dw	0xaa55
+

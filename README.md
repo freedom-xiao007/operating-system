@@ -7,8 +7,9 @@
 需要下载相关的软件，链接如下：
 
 - [NASM](https://www.nasm.us/):汇编语言编译器，第一本书是用自写的nask，但找不到啊，只能网上搜索，然后用这个了（可能后面会导致一些困难，但也没办法了，总有困难在前方）
-- [qemu](https://qemu.weilnetz.de/w64/)：虚拟机，用来启动我们的操作系统，vm和物理机感觉太麻烦了，这个直接用一行命令启动就行了，很方便
+- [qemu](https://qemu.weilnetz.de/w64/)：前面使用的虚拟机，用来启动我们的操作系统，vm和物理机感觉太麻烦了，这个直接用一行命令启动就行了，很方便
 - [git for windows](https://gitforwindows.org/):在本篇中需要拼接其他文件放到镜像文件后面，本文使用的linux下的dd命令，使用git的bash窗口可以使用dd命令，比较方便
+- [bochs download](https://sourceforge.net/projects/bochs/):尝试下来比qemu好用点，还带调试
 
 下载完成后，在git bash中运行run.sh脚本即可：
 
@@ -40,6 +41,7 @@
 ### 书籍源码仓库
 - [《三十天自制操作系统》yourtion/30dayMakeOS](https://github.com/yourtion/30dayMakeOS)
 - [一个64位操作系统的设计和实现](https://github.com/yifengyou/The-design-and-implementation-of-a-64-bit-os)
+- [os-tutorial](https://github.com/cfenollosa/os-tutorial)
 
 ### 相关软件下载
 - [Make for Windows](https://gnuwin32.sourceforge.net/packages/make.htm)
@@ -50,12 +52,15 @@
 - [WinHex Hex Editor](http://www.winhex.com/winhex/hex-editor.html)
 - [DiskGenius](https://www.diskgenius.cn/download.php)
 - [git for windows](https://gitforwindows.org/):在本篇中需要拼接其他文件放到镜像文件后面，本文使用的linux下的dd命令，使用git的bash窗口可以使用dd命令，比较方便
+- [bochs download](https://sourceforge.net/projects/bochs/)
+- [Object file converter download](https://www.agner.org/optimize/#objconv)
 
 ### 相关博客
 - [写操作系统之开发引导扇区](https://www.cnblogs.com/chuganghong/p/15412601.html)
 - [汇编语言一发入魂 0x0C - 解放生产力](https://kviccn.github.io/posts/2020/05/%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%E4%B8%80%E5%8F%91%E5%85%A5%E9%AD%82-0x0c-%E8%A7%A3%E6%94%BE%E7%94%9F%E4%BA%A7%E5%8A%9B/)
 - [关于16、32、64位系统支持内存大小](https://blog.csdn.net/lolloli/article/details/121652854)
 - [X86_64 机器上一共有多少个寄存器](https://www.owalle.com/2021/12/26/all-registers-x86-64/)
+- [从0写操作系统](https://blog.csdn.net/jiaruitao777/category_9531991.html)
 
 ## 备忘
 一般说来，如果能用一个寄存器来表示内存地址的话，当然会很方便，但一个BX只能表示0～0xffff的值，也就是只有0～65535，最大才64K

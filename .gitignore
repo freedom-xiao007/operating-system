@@ -2,3 +2,14 @@
 loader.bin
 loader.img
 os.img
+bochsout.txt
+bootsect.bin
+bootsect.lst
+/c/clean/
+/c/*.asm
+/c/*.o
+head.bin
+head.lst
+kernel.*
+setup.bin
+setup.lst

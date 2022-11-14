@@ -101,7 +101,7 @@ push 0 ;These are the parameters to main :-)
 push 0 ;这些是调用main程序的参数（指init/main.c）。
 push 0  
 push L6 ;return address for main, if it decides to.
-push _main ;'_main'是编译程序对main的内部表示方法。
+push _start ;'_main'是编译程序对main的内部表示方法。
 jmp  setup_paging   ;这里用的JMP而不是call，就是为了在setup_paging结束后的
                     ;ret指令能去执行C程序的main() 
 L6:
@@ -112,12 +112,12 @@ jmp L6 ;main程序绝对不应该返回到这里。不过为了以防万一，
      
 
 
-_main:      ;这里暂时模拟出C程序main() 
-     mov  esi,mainmsg                ;保护模式DS=0,数据用绝对地址访问
-     mov  cl, 0x09                   ;蓝色
-     mov  edi, 0xb8000+22*160        ;指定显示在某行,显卡内存地址需用绝对地址
-     call printnew                   ;0xb8000为字符模式下显卡映射到的内存地址 
-     ret  
+; _main:      ;这里暂时模拟出C程序main() 
+;      mov  esi,mainmsg                ;保护模式DS=0,数据用绝对地址访问
+;      mov  cl, 0x09                   ;蓝色
+;      mov  edi, 0xb8000+22*160        ;指定显示在某行,显卡内存地址需用绝对地址
+;      call printnew                   ;0xb8000为字符模式下显卡映射到的内存地址 
+;      ret  
      
      
 test_keyboard:       ; 测试键盘中断

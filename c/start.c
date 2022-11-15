@@ -7,9 +7,9 @@ void start(void) {
     put_str("0123456789");
     int i;
     char *p;
-    for (i = 0xa0000; i < 0xaffff; i++) {
-	p = (char *) i;
-	*p = i & 0x0f;
+    p = (char *) 0xa0000; /*将地址赋值进去*/
+    for (i = 0; i <= 0xffff; i++) {
+    	p[i] = i & 0x0f;
     }
     while(1);
 }

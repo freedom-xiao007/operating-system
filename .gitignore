@@ -13,3 +13,4 @@ head.lst
 kernel.*
 setup.bin
 setup.lst
+/c/nasm/

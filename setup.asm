@@ -8,10 +8,25 @@ INITSEG  EQU DEF_INITSEG   ;全部同bootsect
 SYSSEG   EQU DEF_SYSSEG	 
 SETUPSEG EQU DEF_SETUPSEG 
 
+VMODE	EQU		0x0ff2			; 关于颜色的信息
+SCRNX	EQU		0x0ff4			; 分辨率X
+SCRNY	EQU		0x0ff6			; 分辨率Y
+VRAM	EQU		0x0ff8			; 图像缓冲区的起始地址
+
+
 jmp      start
 
 start:
+    ; 画面モードを設定
 
+    MOV		AL,0x13			; VGA显卡，320x200x8bit
+    MOV		AH,0x00
+    INT		0x10
+    MOV		BYTE [VMODE],8	; 屏幕的模式（参考C语言的引用）
+    MOV		WORD [SCRNX],320
+    MOV		WORD [SCRNY],200
+    MOV		DWORD [VRAM],0x000a0000
+    
      mov   ax,SETUPSEG
      mov   ds,ax        ;为显示各种提示信息做准备
      mov   si, welcome 

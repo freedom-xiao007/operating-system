@@ -22,9 +22,12 @@
 ![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9021fb684a4548c8b5c9463f6916c696~tplv-k3u1fbpfcp-watermark.image?)
 
 ## 博客文章列表
-- [自制操作系统系列（一）：显示hello world开始旅程](https://juejin.cn/post/7148604415652397070)
-- [自制操作系统系列（二）：软盘读取](https://juejin.cn/post/7153429890220916767)
-- [自制操作系统系列（三）：加载其他文件执行](https://juejin.cn/post/7154194485444870152/)
+- [自制操作系统日记（一）：显示hello world开始旅程](https://juejin.cn/post/7148604415652397070)
+- [自制操作系统日记（二）：软盘读取](https://juejin.cn/post/7153429890220916767)
+- [自制操作系统日记（三）：加载其他文件执行](https://juejin.cn/post/7154194485444870152/)
+- [自制操作系统日记（四）：进入64位模式](https://juejin.cn/post/7164983773233152008)
+- [自制操作系统日记（5）：跳转到C语言执行](https://juejin.cn/post/7166020982421848077)
+- [自制操作系统日记（6）：静态桌面初步 ](https://juejin.cn/post/7166386608550182943)
 
 ## 参考书籍列表
 - [《三十天自制操作系统》](https://github.com/yourtion/30dayMakeOS)

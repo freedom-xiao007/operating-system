@@ -1,26 +1,57 @@
+#define COL8_000000 0
+#define COL8_FF0000 1
+#define COL8_00FF00 2
+#define COL8_FFFF00 3
+#define COL8_0000FF      4
+#define COL8_FF00FF      5
+#define COL8_00FFFF      6
+#define COL8_FFFFFF      7
+#define COL8_C6C6C6      8
+#define COL8_840000      9
+#define COL8_008400      10
+#define COL8_848400      11
+#define COL8_000084      12
+#define COL8_840084      13
+#define COL8_008484      14
+#define COL8_848484      15
+
+/*就算写在同一个源文件里，如果想在定义前使用，还是必须事先声明一下。*/
 void io_hlt(void);
 void io_cli(void);
 void io_out8(int port, int data);
 int io_load_eflags(void);
 void io_store_eflags(int eflags);
 
-/*就算写在同一个源文件里，如果想在定义前使用，还是必须事先声明一下。*/
-
 void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
+void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1);
 
 void start(void)
 {
-    int i; /* 声明变量。变量i是32位整数型 */
-    char *p; /* 变量p是BYTE [...]用的地址 */
-
     init_palette(); /* 设定调色板 */
 
-    p = (char *) 0xa0000; /* 指定地址 */
+    char *vram; /* 变量p是BYTE [...]用的地址 */
+    vram = (char *) 0xa0000; /* 指定地址 */
+    int xsize = 320;
+    int ysize = 200;
 
-    for (i = 0; i <= 0xffff; i++) {
-        p[i] = i & 0x0f;
-    }
+    boxfill8(vram, xsize, COL8_008484,  0,         0,          xsize, ysize - 29);
+    boxfill8(vram, xsize, COL8_C6C6C6,  0,         ysize - 28, xsize, ysize - 28);
+    boxfill8(vram, xsize, COL8_FFFFFF,  0,         ysize - 27, xsize, ysize - 27);
+    boxfill8(vram, xsize, COL8_C6C6C6,  0,         ysize - 26, xsize, ysize -  1);
+
+    //     y距离有时候需要大于3
+    boxfill8(vram, xsize, COL8_FFFFFF,  3,         ysize - 24, 59,         ysize - 21);
+    boxfill8(vram, xsize, COL8_FFFFFF,  2,         ysize - 24,  2,         ysize -  4);
+    boxfill8(vram, xsize, COL8_848484,  3,         ysize -  4, 59,         ysize -  1);
+    boxfill8(vram, xsize, COL8_848484, 59,         ysize - 23, 59,         ysize -  5);
+    boxfill8(vram, xsize, COL8_000000,  2,         ysize -  3, 59,         ysize -  0);
+    boxfill8(vram, xsize, COL8_000000, 60,         ysize - 24, 60,         ysize -  3);
+
+    boxfill8(vram, xsize, COL8_848484, xsize - 47, ysize - 24, xsize -  4, ysize - 21);
+    boxfill8(vram, xsize, COL8_848484, xsize - 47, ysize - 23, xsize - 47, ysize -  4);
+    boxfill8(vram, xsize, COL8_FFFFFF, xsize - 47, ysize -  3, xsize -  4, ysize -  0);
+    boxfill8(vram, xsize, COL8_FFFFFF, xsize -  3, ysize - 24, xsize -  3, ysize -  3);
 
     for (; ; ) {
         io_hlt();
@@ -66,5 +97,16 @@ void set_palette(int start, int end, unsigned char *rgb)
         rgb += 3;
     }
     io_store_eflags(eflags);     /* 复原中断许可标志 */
+    return;
+}
+
+void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1)
+{
+    int x, y;
+    for (x = x0; x <= x1; x++) {
+    for (y = y0; y <= y1; y++) {
+        vram[y * xsize + x] = c;
+    }
+    }
     return;
 }

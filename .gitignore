@@ -15,3 +15,5 @@ setup.bin
 setup.lst
 /c/nasm/
 os.iso
+hankaku.bin
+hankaku.obj

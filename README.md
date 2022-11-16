@@ -9,17 +9,79 @@
 - [NASM](https://www.nasm.us/):汇编语言编译器，第一本书是用自写的nask，但找不到啊，只能网上搜索，然后用这个了（可能后面会导致一些困难，但也没办法了，总有困难在前方）
 - [qemu](https://qemu.weilnetz.de/w64/)：前面使用的虚拟机，用来启动我们的操作系统，vm和物理机感觉太麻烦了，这个直接用一行命令启动就行了，很方便
 - [git for windows](https://gitforwindows.org/):在本篇中需要拼接其他文件放到镜像文件后面，本文使用的linux下的dd命令，使用git的bash窗口可以使用dd命令，比较方便
-- [bochs download](https://sourceforge.net/projects/bochs/):尝试下来比qemu好用点，还带调试
+- [bochs download](https://sourceforge.net/projects/bochs/):尝试下来比qemu好用点，还带调试,安装配置说明参考后面
 
-下载完成后，在git bash中运行run.sh脚本即可：
+下载完成后，在git bash中运行run.bat脚本即可
 
-如下图：运行git bash、运行脚本、成功显示
+## bochs安装使用说明
+首先bochs的下载地址为：https://sourceforge.net/projects/bochs/
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa31095aef684b8589a7f313fbee32a9~tplv-k3u1fbpfcp-watermark.image?)
+解压后，我们需要修改：D:\software\Bochs-2.7\dlxlinux\bochsr.bxrc成D:\software\Bochs-2.7\dlxlinux\bochsr_m.bxrc
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d645364d2e114e0a8b57ad68ecba7121~tplv-k3u1fbpfcp-watermark.image?)
+主要修改文件的对应路径和启动方式，整个配置文件如下：
 
-![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9021fb684a4548c8b5c9463f6916c696~tplv-k3u1fbpfcp-watermark.image?)
+```text
+###############################################################
+# bochsrc.txt file for DLX Linux disk image.
+###############################################################
+
+# how much memory the emulated machine will have
+megs: 32
+
+# filename of ROM images,替换原来的相对路径为绝对路径
+romimage: file=D:\\software\\Bochs-2.7\\BIOS-bochs-latest
+vgaromimage: file=D:\\software\\Bochs-2.7\\VGABIOS-lgpl-latest
+
+# what disk images will be used 
+# 指明启动的镜像为我们的os.iso镜像文件
+floppya: 1_44=E:\\code\\other\\self\\operating-system\\os.iso, status=inserted
+floppyb: 1_44=floppyb.img, status=inserted
+
+# hard disk
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata0-master: type=disk, path="D:\\software\\Bochs-2.7\\dlxlinux\\hd10meg.img", cylinders=306, heads=4, spt=17
+
+# choose the boot disk.修改启动方式为软盘
+boot: floppy
+
+# default config interface is textconfig.
+#config_interface: textconfig
+#config_interface: wx
+
+#display_library: x
+# other choices: win32 sdl wx carbon amigaos beos macintosh nogui rfb term svga
+
+# where do we send log messages?
+log: bochsout.txt
+
+# disable the mouse, since DLX is text only
+mouse: enabled=0
+
+# set up IPS value and clock sync
+cpu: ips=15000000
+clock: sync=both
+
+# enable key mapping, using US layout as default.
+#
+# NOTE: In Bochs 1.4, keyboard mapping is only 100% implemented on X windows.
+# However, the key mapping tables are used in the paste function, so 
+# in the DLX Linux example I'm enabling keyboard_mapping so that paste 
+# will work.  Cut&Paste is currently implemented on win32 and X windows only.
+
+# 替换原来的相对路径为绝对路径
+keyboard: keymap=D:\\software\\Bochs-2.7\\keymaps/x11-pc-us.map
+#keyboard: keymap=D:\\software\\Bochs-2.7\\keymaps/x11-pc-fr.map
+#keyboard: keymap=D:\\software\\Bochs-2.7\\keymaps/x11-pc-de.map
+#keyboard: keymap=D:\\software\\Bochs-2.7\\keymaps/x11-pc-es.map
+```
+
+这样就OK了，这个是启动的配置文件
+
+在我们的一键运行脚本中，配置使用该文件即可
+
+```powershell
+D:\\software\\Bochs-2.7\\bochs -q -f D:\\software\\Bochs-2.7\\dlxlinux\\bochsrc_m.bxrc
+```
 
 ## 博客文章列表
 - [自制操作系统日记（一）：显示hello world开始旅程](https://juejin.cn/post/7148604415652397070)
@@ -28,6 +90,7 @@
 - [自制操作系统日记（四）：进入64位模式](https://juejin.cn/post/7164983773233152008)
 - [自制操作系统日记（5）：跳转到C语言执行](https://juejin.cn/post/7166020982421848077)
 - [自制操作系统日记（6）：静态桌面初步 ](https://juejin.cn/post/7166386608550182943)
+- [自制操作系统日记（7）：字符串显示](https://juejin.cn/post/7166456684972834847/)
 
 ## 参考书籍列表
 - [《三十天自制操作系统》](https://github.com/yourtion/30dayMakeOS)

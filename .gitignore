@@ -17,3 +17,5 @@ setup.lst
 os.iso
 hankaku.bin
 hankaku.obj
+.idea/
+cmake*

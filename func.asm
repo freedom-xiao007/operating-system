@@ -56,3 +56,11 @@ _io_store_eflags:   ; void io_store_eflags(int eflags);
         PUSH EAX
         POPFD ; 指POP EFLAGS
         RET
+_print_s:
+        mov  esi,[esp+4H]                 ;保护模式DS=0,数据用绝对地址访问
+        mov  cl, 0x09                   ;蓝色字体
+        mov  edi, 0xb8000+22*160        ;指定显示在某行,显卡内存地址也需用绝对地址访问     
+        call printnew
+        RET
+_get_char:
+        RET

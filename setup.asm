@@ -18,14 +18,13 @@ jmp      start
 
 start:
     ; 画面モードを設定
-
-    MOV		AL,0x13			; VGA显卡，320x200x8bit
-    MOV		AH,0x00
-    INT		0x10
-    MOV		BYTE [VMODE],8	; 屏幕的模式（参考C语言的引用）
-    MOV		WORD [SCRNX],320
-    MOV		WORD [SCRNY],200
-    MOV		DWORD [VRAM],0x000a0000
+;     MOV		AL,0x13			; VGA显卡，320x200x8bit
+;     MOV		AH,0x00
+;     INT		0x10
+;     MOV		BYTE [VMODE],8	; 屏幕的模式（参考C语言的引用）
+;     MOV		WORD [SCRNX],320
+;     MOV		WORD [SCRNY],200
+;     MOV		DWORD [VRAM],0x000a0000
     
      mov   ax,SETUPSEG
      mov   ds,ax        ;为显示各种提示信息做准备
@@ -315,6 +314,10 @@ mov  esi,headmsg+SETUPSEG*0x10
 mov  edi, 0xb8000+22*160        ;显示在第22行
 call printnew
 
+mov  esi,headmsg1+SETUPSEG*0x10
+mov  edi, 0xb8000+34*160        ;显示在第22行
+call printnew
+
 jmp  $
 
 
@@ -336,5 +339,6 @@ printover:
 sysmsg  db '(iii) Welcome Linux---system!','$'
 promsg  db '1.Now Already in Protect Mode','$'
 headmsg db '2.Run head.asm in system program','$'
+headmsg1 db '3.Run head.asm in system program','$'
 
 times 512*4-($-$$) db 0    ;控制setup最终的机器代码长度为4个扇区

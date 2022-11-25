@@ -91,6 +91,7 @@ D:\\software\\Bochs-2.7\\bochs -q -f D:\\software\\Bochs-2.7\\dlxlinux\\bochsrc_
 - [自制操作系统日记（5）：跳转到C语言执行](https://juejin.cn/post/7166020982421848077)
 - [自制操作系统日记（6）：静态桌面初步 ](https://juejin.cn/post/7166386608550182943)
 - [自制操作系统日记（7）：字符串显示](https://juejin.cn/post/7166456684972834847/)
+- [自制操作系统日记（8）：变量显示](https://juejin.cn/post/7169798349095190541)
 
 ## 参考书籍列表
 - [《三十天自制操作系统》](https://github.com/yourtion/30dayMakeOS)

@@ -18,13 +18,13 @@ jmp      start
 
 start:
     ; 画面モードを設定
-;     MOV		AL,0x13			; VGA显卡，320x200x8bit
-;     MOV		AH,0x00
-;     INT		0x10
-;     MOV		BYTE [VMODE],8	; 屏幕的模式（参考C语言的引用）
-;     MOV		WORD [SCRNX],320
-;     MOV		WORD [SCRNY],200
-;     MOV		DWORD [VRAM],0x000a0000
+    MOV		AL,0x13			; VGA显卡，320x200x8bit
+    MOV		AH,0x00
+    INT		0x10
+    MOV		BYTE [VMODE],8	; 屏幕的模式（参考C语言的引用）
+    MOV		WORD [SCRNX],320
+    MOV		WORD [SCRNY],200
+    MOV		DWORD [VRAM],0x000a0000
     
      mov   ax,SETUPSEG
      mov   ds,ax        ;为显示各种提示信息做准备

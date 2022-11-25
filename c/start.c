@@ -28,6 +28,8 @@ void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, i
 void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
 void putfont8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
 
+void int_2_string(int num, char *s);
+
 static char font_A[16] = {
     0x00, 0x18, 0x18, 0x18, 0x18, 0x24, 0x24, 0x24,
     0x24, 0x7e, 0x42, 0x42, 0x42, 0xe7, 0x00, 0x00
@@ -60,7 +62,11 @@ void start(void)
     boxfill8(vram, xsize, COL8_FFFFFF, xsize - 47, ysize -  3, xsize -  4, ysize -  0);
     boxfill8(vram, xsize, COL8_FFFFFF, xsize -  3, ysize - 24, xsize -  3, ysize -  3);
 
-    putfont8_asc(vram, xsize, 8, 8, COL8_FFFFFF, "Hollo OS!");
+    putfont8_asc(vram, xsize, 8, 8, COL8_FFFFFF, "Hollo OS 123456!");
+
+    char s[10];
+    int_2_string(xsize, s);
+    putfont8_asc(vram, xsize, 16, 64, COL8_FFFFFF, s); 
 
     for (; ; ) {
         io_hlt();
@@ -147,5 +153,31 @@ void putfont8(char *vram, int xsize, int x, int y, char c,  char *font)
         if ((d & 0x02) != 0) { p[6] = c; }
         if ((d & 0x01) != 0) { p[7] = c; }
     }
+    return;
+}
+
+// 目前默认处理正整数，转换成十进制，先简单点
+void int_2_string(int num, char *s) {
+    char num_index[] = "0123456789";
+    
+    char temp[40];
+    int i = 0;
+    int remain = num % 10;
+    temp[i] = num_index[remain];
+    num = num / 10;
+    while (num > 0) {
+        i = i + 1;
+        remain = num % 10;
+        temp[i] = num_index[remain];
+        num = num / 10;
+    }
+
+    int j = 0;
+    while(i > -1) {
+        s[j] = temp[i]; 
+        j = j + 1;
+        i = i - 1;
+    }
+    s[j] = 0x00;
     return;
 }

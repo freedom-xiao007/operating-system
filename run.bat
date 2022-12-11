@@ -11,7 +11,7 @@ D:\\software\\objconv\\objconv.exe -fnasm .\\c\\start.o .\\c\\nasm\\start.asm
 D:\\software\\objconv\\objconv.exe -fnasm .\hankaku.obj .\\c\\nasm\\hankaku.asm
 
 @REM 处理生成的nasm不合理的的地方
-D:\\software\\python3\\python.exe E:\\code\\python\\self\\tools\\tools\\objconv2nasm_clearn.py
+D:\\software\\python3\\python.exe .\\python\\objconv2nasm_clearn.py
 
 @REM 合并文件，编译运行
 copy /B head.asm+.\\c\\clean\\start.asm+func.asm+.\\c\\clean\\hankaku.asm kernel.asm

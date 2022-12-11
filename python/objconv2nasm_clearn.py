@@ -18,8 +18,14 @@ def clean_nasm_file(file_name, nasm_path, clean_path):
 
 
 if __name__ == "__main__":
-    nasm_path = "E:\\code\\other\\self\\operating-system\\c\\nasm"
-    clean_path = "E:\\code\\other\\self\\operating-system\\c\\clean"
+    nasm_path = ".\\c\\nasm"
+    if not os.path.exists(nasm_path):
+        os.makedirs(nasm_path)
+
+    clean_path = ".\\c\\clean"
+    if not os.path.exists(clean_path):
+        os.makedirs(clean_path)
+
     files = os.listdir(nasm_path)
     for file in files:
         if not os.path.isdir(file):

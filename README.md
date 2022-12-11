@@ -10,6 +10,7 @@
 - [qemu](https://qemu.weilnetz.de/w64/)：前面使用的虚拟机，用来启动我们的操作系统，vm和物理机感觉太麻烦了，这个直接用一行命令启动就行了，很方便
 - [git for windows](https://gitforwindows.org/):在本篇中需要拼接其他文件放到镜像文件后面，本文使用的linux下的dd命令，使用git的bash窗口可以使用dd命令，比较方便
 - [bochs download](https://sourceforge.net/projects/bochs/):尝试下来比qemu好用点，还带调试,安装配置说明参考后面
+- [Object file converter download](https://www.agner.org/optimize/#objconv)
 
 下载完成后，在git bash中运行run.bat脚本即可
 
